@@ -4,8 +4,9 @@
 
 - Use the simplest possible solution
 - Prefer procedural programming and functional programming paradigms
+- **Simplicity**: Use the simplest possible solution. Service Oriented Architecture is intended for COMPLEX projects. For simple tasks, keep it simple.
+- **Avoid Classes**: Prefer object literals returned by factory functions, along with TypeScript interfaces.
 - Use well-maintained, mature libraries where possible (check npm weekly downloads and last update date)
-- If you feel a need to use object-oriented programming or polymorphism, ask the user about your design first
 - Ensure you include JSDoc comments for all exported functions, classes, and interfaces
 - Run the linter (ESLint) as frequently as possible to detect any issues and fix them
 - Avoid overriding the linter or using language escape hatches such as:
@@ -17,6 +18,16 @@
   - Test your implementation using the project's test framework (Jest, Vitest, etc.)
   - If you don't know how to test your implementation, ask the user for help
 - When handling unknown data structures, use a validation library such as Zod, io-ts, or yup
+
+## Architecture & Design
+
+- **Service Oriented Architecture**: For **COMPLEX** projects, decompose systems into small, individually testable services located under a `lib` folder.
+- **Implementation Style**: When implementing services, prefer a **procedural** or **functional** style over complex object-oriented patterns.
+- **Dependency Structure**: Design services with orthogonality, layering, and proper abstraction levels in mind. Tend towards a tree or diamond dependency pattern. Apply **SOLID principles**.
+- **Adapter Pattern**: Always wrap external APIs or services in an adapter service with minimal logic.
+- **Design Review**: You MUST always have the user review your service design before implementation.
+- **Test Confirmation**: You MUST always ask the user if they would like tests to be added when performing a task.
+- **Manual Testing**: If the user declines automated tests, you MUST try to test manually. If you don't know how to test manually, you MUST ask the user for help.
 
 ## TypeScript-Specific Guidelines
 
@@ -89,6 +100,7 @@
 - Use descriptive test names that explain the behavior
 - Test types using utility types like `Expect` or `AssertTrue`
 - Mock external dependencies properly
+- **Adapter Testing**: Only tests for adapters should invoke actual external dependencies. Other services should use mocks or stubs of the adapters.
 - Aim for meaningful coverage, not just high percentages
 
 ### Performance
@@ -109,7 +121,7 @@
 ### Common Patterns
 
 - **Builder Pattern**: Use method chaining with proper type inference
-- **Factory Functions**: Prefer over classes for creating objects
+- **Factory Functions**: **PREFERRED** over classes for creating objects and services.
 - **Discriminated Unions**: Use for state machines and variant types
 - **Type Predicates**: Create reusable type guards
 - **Utility Types**: Leverage built-in types like `Partial`, `Required`, `Pick`, `Omit`
@@ -135,6 +147,12 @@
 - Enable source maps for debugging
 - Use `debugger` statements sparingly and remove before committing
 - Leverage Chrome DevTools for runtime debugging
+
+## Version Control
+
+- **Conventional Commits**: You MUST use **Conventional Commits** for all git commit messages.
+- **User Confirmation**: You MUST always ask the user for confirmation before committing any files.
+- **Cleanup**: You MUST clean up any temporary files or build artifacts before committing.
 
 ## Checklist Before Committing
 

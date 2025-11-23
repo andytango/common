@@ -4,6 +4,7 @@
 
 - Use the simplest possible solution
 - Prefer procedural programming and functional programming paradigms
+- **Simplicity**: Use the simplest possible solution. Service Oriented Architecture is intended for COMPLEX projects. For simple tasks, keep it simple.
 - Use well-maintained, mature crates where possible (check crates.io downloads and recent activity)
 - If you feel a need to use complex trait hierarchies or excessive polymorphism, ask the user about your design first
 - Ensure you include documentation comments for all public items
@@ -19,6 +20,16 @@
   - Run `cargo clippy` for linting
   - If you don't know how to test your implementation, ask the user for help
 - When handling unknown data structures, use serde for serialization/deserialization with proper validation
+
+## Architecture & Design
+
+- **Service Oriented Architecture**: For **COMPLEX** projects, decompose systems into small, individually testable services located under a `lib` folder.
+- **Implementation Style**: When implementing services, prefer a **procedural** or **functional** style over complex object-oriented patterns.
+- **Dependency Structure**: Design services with orthogonality, layering, and proper abstraction levels in mind. Tend towards a tree or diamond dependency pattern. Apply **SOLID principles**.
+- **Adapter Pattern**: Always wrap external APIs or services in an adapter service with minimal logic.
+- **Design Review**: You MUST always have the user review your service design before implementation.
+- **Test Confirmation**: You MUST always ask the user if they would like tests to be added when performing a task.
+- **Manual Testing**: If the user declines automated tests, you MUST try to test manually. If you don't know how to test manually, you MUST ask the user for help.
 
 ## Rust-Specific Guidelines
 
@@ -104,6 +115,7 @@
 
 ### Traits and Generics
 
+- **Services as Traits**: Define services using traits to allow for easy mocking and dependency injection.
 - Implement standard traits where appropriate:
   - `Debug`, `Clone`, `PartialEq`, `Eq`
   - `Default` for types with sensible defaults
@@ -145,6 +157,7 @@
   }
   ```
 - Use integration tests in `tests/` directory
+- **Adapter Testing**: Only tests for adapters should invoke actual external dependencies. Other services should use mocks of the traits.
 - Use property-based testing with `proptest` or `quickcheck` for complex logic
 - Test error cases explicitly
 - Use `#[should_panic]` for tests that should panic
@@ -226,6 +239,12 @@
   ```
 - Use `cargo fmt` for consistent formatting
 - Configure `rustfmt.toml` for project style
+
+## Version Control
+
+- **Conventional Commits**: You MUST use **Conventional Commits** for all git commit messages.
+- **User Confirmation**: You MUST always ask the user for confirmation before committing any files.
+- **Cleanup**: You MUST clean up any temporary files or build artifacts before committing.
 
 ## Checklist Before Committing
 

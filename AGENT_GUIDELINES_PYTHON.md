@@ -4,6 +4,7 @@
 
 - Use the simplest possible solution
 - Prefer procedural programming and functional programming paradigms
+- **Simplicity**: Use the simplest possible solution. Service Oriented Architecture is intended for COMPLEX projects. For simple tasks, keep it simple.
 - Use well-maintained, mature packages where possible (check PyPI downloads and recent releases)
 - If you feel a need to use complex class hierarchies or metaclasses, ask the user about your design first
 - Ensure you include docstrings for all modules, classes, and functions
@@ -19,6 +20,16 @@
   - Check code coverage if configured
   - If you don't know how to test your implementation, ask the user for help
 - When handling unknown data structures, use a validation library such as Pydantic, marshmallow, or cerberus
+
+## Architecture & Design
+
+- **Service Oriented Architecture**: For **COMPLEX** projects, decompose systems into small, individually testable services located under a `lib` folder.
+- **Implementation Style**: When implementing services, prefer a **procedural** or **functional** style over complex object-oriented patterns.
+- **Dependency Structure**: Design services with orthogonality, layering, and proper abstraction levels in mind. Tend towards a tree or diamond dependency pattern. Apply **SOLID principles**.
+- **Adapter Pattern**: Always wrap external APIs or services in an adapter service with minimal logic.
+- **Design Review**: You MUST always have the user review your service design before implementation.
+- **Test Confirmation**: You MUST always ask the user if they would like tests to be added when performing a task.
+- **Manual Testing**: If the user declines automated tests, you MUST try to test manually. If you don't know how to test manually, you MUST ask the user for help.
 
 ## Python-Specific Guidelines
 
@@ -118,6 +129,7 @@
 ### Functions and Methods
 
 - Keep functions small and focused (single responsibility)
+- **Services as Functions**: Services can be implemented as module-level functions that consume objects and call methods on them.
 - Use default arguments carefully (avoid mutable defaults):
   ```python
   # Bad
@@ -138,6 +150,7 @@
 
 ### Classes and Objects
 
+- **Services as Classes**: Services can be implemented as plain classes with dependencies "injectable" via the constructor.
 - Prefer composition over inheritance
 - Use `dataclasses` for simple data containers:
   ```python
@@ -211,6 +224,7 @@
       assert sample_user.name == "Updated Name"
   ```
 - Mock external dependencies
+- **Adapter Testing**: Only tests for adapters should invoke actual external dependencies. Other services should use mocks or stubs of the adapters.
 - Use parametrize for multiple test cases:
   ```python
   @pytest.mark.parametrize("input,expected", [
@@ -348,6 +362,12 @@ project/
   ```
 - Keep configuration separate from code
 - Use different configs for dev/test/prod
+
+## Version Control
+
+- **Conventional Commits**: You MUST use **Conventional Commits** for all git commit messages.
+- **User Confirmation**: You MUST always ask the user for confirmation before committing any files.
+- **Cleanup**: You MUST clean up any temporary files or build artifacts before committing.
 
 ## Checklist Before Committing
 
