@@ -61,6 +61,39 @@
 
 - Use arrow functions for callbacks and inline functions
 - Use regular function declarations for top-level functions
+- **Context Objects**: When functions share common context or state (e.g., database client, logger, external service, callbacks, or common data parameters), use a "context object" passed as the first argument with an explicit interface:
+  ```typescript
+  interface ServiceContext {
+    db: DatabaseClient;
+    logger: Logger;
+    config: AppConfig;
+  }
+
+  function getUser(ctx: ServiceContext, userId: string): Promise<User> {
+    ctx.logger.info('Fetching user', { userId });
+    return ctx.db.users.findById(userId);
+  }
+
+  function updateUser(ctx: ServiceContext, userId: string, data: UserUpdate): Promise<User> {
+    ctx.logger.info('Updating user', { userId });
+    return ctx.db.users.update(userId, data);
+  }
+  ```
+- **Avoid Destructuring in Function Arguments**: Do not destructure objects in function parameters. Instead, accept the object as-is and destructure at the top of the function body. This keeps function signatures and JSDoc cleaner, and makes it easy to pass the object to nested function calls:
+  ```typescript
+  // Avoid this:
+  function processOrder({ orderId, items, customer }: OrderInput): Result {
+    // ...
+  }
+
+  // Prefer this:
+  function processOrder(input: OrderInput): Result {
+    const { orderId, items, customer } = input;
+    // Now 'input' can easily be passed to helper functions
+    validateOrder(input);
+    // ...
+  }
+  ```
 - Provide JSDoc comments with examples:
   ```typescript
   /**
