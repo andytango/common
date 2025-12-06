@@ -14,6 +14,7 @@
 
 - **Service Oriented Architecture**: For **COMPLEX** projects, decompose systems into small, individually testable services located under a `lib` folder.
 - **Implementation Style**: When implementing services, prefer a **procedural** or **functional** style over complex object-oriented patterns.
+- **Declaration Order**: To improve readability and maintainability, declarations should be logically ordered. A good practice is to order declarations based on reverse dependency and the likely call sequence, with exported declarations preceding local ones.
 - **Dependency Structure**: Design services with orthogonality, layering, and proper abstraction levels in mind. Tend towards a tree or diamond dependency pattern. Apply **SOLID principles**.
 - **Adapter Pattern**: Always wrap external APIs or services in an adapter service with minimal logic.
 - **Design Review**: You MUST always have the user review your service design before implementation.

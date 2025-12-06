@@ -62,6 +62,7 @@
 - Use arrow functions for callbacks and inline functions
 - Use regular function declarations for top-level functions
 - **Context Objects**: When functions share common context or state (e.g., database client, logger, external service, callbacks, or common data parameters), use a "context object" passed as the first argument with an explicit interface:
+
   ```typescript
   interface ServiceContext {
     db: DatabaseClient;
@@ -70,16 +71,22 @@
   }
 
   function getUser(ctx: ServiceContext, userId: string): Promise<User> {
-    ctx.logger.info('Fetching user', { userId });
+    ctx.logger.info("Fetching user", { userId });
     return ctx.db.users.findById(userId);
   }
 
-  function updateUser(ctx: ServiceContext, userId: string, data: UserUpdate): Promise<User> {
-    ctx.logger.info('Updating user', { userId });
+  function updateUser(
+    ctx: ServiceContext,
+    userId: string,
+    data: UserUpdate,
+  ): Promise<User> {
+    ctx.logger.info("Updating user", { userId });
     return ctx.db.users.update(userId, data);
   }
   ```
+
 - **Avoid Destructuring in Function Arguments**: Do not destructure objects in function parameters. Instead, accept the object as-is and destructure at the top of the function body. This keeps function signatures and JSDoc cleaner, and makes it easy to pass the object to nested function calls:
+
   ```typescript
   // Avoid this:
   function processOrder({ orderId, items, customer }: OrderInput): Result {
@@ -94,6 +101,7 @@
     // ...
   }
   ```
+
 - Provide JSDoc comments with examples:
   ```typescript
   /**
@@ -115,6 +123,13 @@
 
 ### Code Organization
 
+- **Declaration Order**: To improve readability and maintainability, declarations should be ordered based on reverse dependency and likely call sequence. The standard order is as follows:
+  1.  **Exported Types**: Interfaces and types that are part of the public API.
+  2.  **Local Types**: Interfaces and types used only within the current file.
+  3.  **Exported Assignments**: Constants and variables that are part of the public API.
+  4.  **Local Assignments**: Constants and variables used only within the current file.
+  5.  **Exported Functions**: Functions that are part of the public API.
+  6.  **Local Functions**: Helper functions used only within the current file.
 - One exported item per file for components/classes
 - Group related utilities in a single file
 - Use barrel exports (index.ts) sparingly to avoid circular dependencies
@@ -162,13 +177,14 @@
 ### Validation
 
 - Runtime validation at system boundaries:
+
   ```typescript
-  import { z } from 'zod';
+  import { z } from "zod";
 
   const UserSchema = z.object({
     id: z.string().uuid(),
     email: z.string().email(),
-    age: z.number().min(0).max(120)
+    age: z.number().min(0).max(120),
   });
 
   type User = z.infer<typeof UserSchema>;
