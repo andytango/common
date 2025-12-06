@@ -46,6 +46,7 @@
 - **Never use `unwrap()` or `expect()` in production code** outside of tests
 - Use the `?` operator for error propagation
 - Create custom error types with `thiserror` or `anyhow`:
+
   ```rust
   use thiserror::Error;
 
@@ -57,6 +58,7 @@
       Config { msg: String },
   }
   ```
+
 - Use `Result<T, E>` as return type for fallible operations
 - Consider using `Option<T>` for values that might not exist
 
@@ -74,7 +76,7 @@
 ### Documentation
 
 - Write documentation comments for all public items:
-  ```rust
+  ````rust
   /// Calculates the factorial of a number.
   ///
   /// # Arguments
@@ -97,13 +99,21 @@
   pub fn factorial(n: u32) -> u32 {
       // implementation
   }
-  ```
+  ````
 - Include examples in doc comments
 - Document panic conditions
 - Document safety requirements for `unsafe` functions
 
 ### Code Organization
 
+- **Declaration Order**: To improve readability and maintainability, declarations should be logically ordered. While `rustfmt` handles most formatting, a good practice is to order declarations based on reverse dependency and the likely call sequence:
+  1.  `use` statements.
+  2.  `static` and `const` items.
+  3.  `type` definitions (`struct`, `enum`, `union`).
+  4.  `trait` definitions.
+  5.  `impl` blocks.
+  6.  Public functions (`pub fn`).
+  7.  Private functions (`fn`).
 - Keep modules small and focused
 - Use `mod.rs` or separate files for module organization
 - Follow Rust naming conventions:
@@ -145,6 +155,7 @@
 ### Testing
 
 - Write unit tests in the same file using `#[cfg(test)]`:
+
   ```rust
   #[cfg(test)]
   mod tests {
@@ -156,6 +167,7 @@
       }
   }
   ```
+
 - Use integration tests in `tests/` directory
 - **Adapter Testing**: Only tests for adapters should invoke actual external dependencies. Other services should use mocks of the traits.
 - Use property-based testing with `proptest` or `quickcheck` for complex logic
@@ -189,6 +201,7 @@
 ### Common Patterns
 
 - **Builder Pattern**: For complex object construction
+
   ```rust
   pub struct ConfigBuilder {
       // fields
@@ -200,6 +213,7 @@
       pub fn build(self) -> Result<Config, Error> { /* ... */ }
   }
   ```
+
 - **Type State Pattern**: For compile-time state machines
 - **RAII**: Leverage `Drop` trait for cleanup
 - **Interior Mutability**: Use `Cell`, `RefCell` when needed
@@ -207,6 +221,7 @@
 ### Validation and Parsing
 
 - Use serde with validation:
+
   ```rust
   use serde::{Deserialize, Serialize};
   use validator::Validate;
@@ -221,6 +236,7 @@
       age: u8,
   }
   ```
+
 - Parse, don't validate (make invalid states unrepresentable)
 - Use strong types to enforce invariants
 
@@ -228,6 +244,7 @@
 
 - Use workspace for multi-crate projects
 - Configure useful lints in `Cargo.toml`:
+
   ```toml
   [lints.rust]
   unsafe_code = "warn"
@@ -237,6 +254,7 @@
   all = "warn"
   pedantic = "warn"
   ```
+
 - Use `cargo fmt` for consistent formatting
 - Configure `rustfmt.toml` for project style
 

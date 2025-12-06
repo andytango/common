@@ -77,6 +77,7 @@
 ### Docstrings
 
 - Use docstrings for all public modules, functions, classes, and methods:
+
   ```python
   def fetch_user_data(user_id: int, include_profile: bool = False) -> Dict[str, Any]:
       """
@@ -99,12 +100,14 @@
       """
       ...
   ```
+
 - Use Google, NumPy, or Sphinx docstring style consistently
 - Include type information in docstrings if not using type hints
 
 ### Error Handling
 
 - Use specific exception types:
+
   ```python
   class ValidationError(Exception):
       """Raised when validation fails."""
@@ -114,6 +117,7 @@
       """Raised when configuration is invalid."""
       pass
   ```
+
 - Never use bare `except:` clauses
 - Always specify exception type:
   ```python
@@ -131,6 +135,7 @@
 - Keep functions small and focused (single responsibility)
 - **Services as Functions**: Services can be implemented as module-level functions that consume objects and call methods on them.
 - Use default arguments carefully (avoid mutable defaults):
+
   ```python
   # Bad
   def append_to_list(item, target=[]):
@@ -144,6 +149,7 @@
       target.append(item)
       return target
   ```
+
 - Use `*args` and `**kwargs` judiciously
 - Prefer returning early over nested conditionals
 - Use generator functions for large data sets
@@ -153,6 +159,7 @@
 - **Services as Classes**: Services can be implemented as plain classes with dependencies "injectable" via the constructor.
 - Prefer composition over inheritance
 - Use `dataclasses` for simple data containers:
+
   ```python
   from dataclasses import dataclass
 
@@ -163,9 +170,11 @@
       email: str
       active: bool = True
   ```
+
 - Use `__slots__` for memory efficiency when needed
 - Implement `__str__` and `__repr__` for debugging
 - Use properties for computed attributes:
+
   ```python
   class Circle:
       def __init__(self, radius: float):
@@ -185,6 +194,7 @@
 - Use absolute imports when possible
 - Avoid wildcard imports (`from module import *`)
 - Group imports logically:
+
   ```python
   import os
   import sys
@@ -199,11 +209,21 @@
   from myapp.utils import calculate_hash
   ```
 
+### Code Organization
+
+- **Declaration Order**: To improve readability and maintainability, declarations should be logically ordered. While Python's dynamic nature is flexible, a good practice is to order declarations based on reverse dependency and the likely call sequence:
+  1.  **Constants**: `UPPER_SNAKE_CASE` variables.
+  2.  **Public Classes**: Classes intended for external use.
+  3.  **Public Functions**: Functions intended for external use.
+  4.  **Private Classes**: Internal helper classes, prefixed with an underscore (`_`).
+  5.  **Private Functions**: Internal helper functions, prefixed with an underscore (`_`).
+
 ### Testing
 
 - Use pytest for testing (preferred over unittest)
 - Write tests alongside implementation
 - Use descriptive test names:
+
   ```python
   def test_user_creation_with_valid_data():
       ...
@@ -211,7 +231,9 @@
   def test_user_creation_raises_error_for_invalid_email():
       ...
   ```
+
 - Use fixtures for test setup:
+
   ```python
   import pytest
 
@@ -223,6 +245,7 @@
       sample_user.name = "Updated Name"
       assert sample_user.name == "Updated Name"
   ```
+
 - Mock external dependencies
 - **Adapter Testing**: Only tests for adapters should invoke actual external dependencies. Other services should use mocks or stubs of the adapters.
 - Use parametrize for multiple test cases:
@@ -263,6 +286,7 @@
 ### Data Validation
 
 - Use Pydantic for data validation and settings:
+
   ```python
   from pydantic import BaseModel, EmailStr, validator
   from typing import Optional
@@ -279,12 +303,14 @@
               raise ValueError('Age must be between 0 and 150')
           return v
   ```
+
 - Validate at system boundaries
 - Use type checking with mypy or pyright
 
 ### Logging
 
 - Use the `logging` module, not `print()`:
+
   ```python
   import logging
 
@@ -296,6 +322,7 @@
   logger.error("Error message")
   logger.critical("Critical error")
   ```
+
 - Configure logging properly in main entry point
 - Use structured logging when appropriate
 - Include context in log messages
@@ -349,6 +376,7 @@ project/
 
 - Use environment variables for configuration
 - Consider using Pydantic Settings:
+
   ```python
   from pydantic import BaseSettings
 
@@ -360,6 +388,7 @@ project/
       class Config:
           env_file = ".env"
   ```
+
 - Keep configuration separate from code
 - Use different configs for dev/test/prod
 
