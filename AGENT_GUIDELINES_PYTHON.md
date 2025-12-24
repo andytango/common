@@ -23,6 +23,8 @@
 
 ## Architecture & Design
 
+- **Single Responsibility Principle**: Each module, class, or function should have one, and only one, reason to change. Decompose large, multi-purpose components into smaller, focused ones.
+- **Composition over Configuration/Inheritance**: Favor composition to define behavior. If a component operates in different "modes" with overlapping but distinct dependencies or logic, do not use internal flags or configuration options to switch behavior. Instead, extract shared dependencies and create distinct implementations (strategies) for each mode.
 - **Service Oriented Architecture**: For **COMPLEX** projects, decompose systems into small, individually testable services located under a `lib` folder.
 - **Implementation Style**: When implementing services, prefer a **procedural** or **functional** style over complex object-oriented patterns.
 - **Dependency Structure**: Design services with orthogonality, layering, and proper abstraction levels in mind. Tend towards a tree or diamond dependency pattern. Apply **SOLID principles**.
@@ -30,6 +32,19 @@
 - **Design Review**: You MUST always have the user review your service design before implementation.
 - **Test Confirmation**: You MUST always ask the user if they would like tests to be added when performing a task.
 - **Manual Testing**: If the user declines automated tests, you MUST try to test manually. If you don't know how to test manually, you MUST ask the user for help.
+
+## Anti-patterns
+
+- **Mode Flags**: Avoid functions or services that take a boolean flag or "mode" enum to significantly alter their behavior.
+  - **Bad**:
+    ```python
+    def process_payment(amount, mode="stripe"):
+        if mode == "stripe":
+            # ... stripe logic ...
+        elif mode == "paypal":
+            # ... paypal logic ...
+    ```
+  - **Good**: Create distinct services/functions (`StripePaymentProcessor`, `PayPalPaymentProcessor`) that implement a common protocol or interface. Inject the specific implementation required.
 
 ## Python-Specific Guidelines
 
@@ -106,29 +121,43 @@
 
 ### Error Handling
 
-- Use specific exception types:
+- **Favor Result Objects over Exceptions**: Use a structured Result pattern for expected domain errors. Reserve exceptions for truly exceptional, unrecoverable states (e.g., memory errors, configuration errors preventing startup).
 
   ```python
-  class ValidationError(Exception):
-      """Raised when validation fails."""
-      pass
+  from dataclasses import dataclass
+  from typing import Generic, TypeVar, Union
 
-  class ConfigurationError(Exception):
-      """Raised when configuration is invalid."""
-      pass
+  T = TypeVar("T")
+  E = TypeVar("E")
+
+  @dataclass
+  class Success(Generic[T]):
+      value: T
+      is_success: bool = True
+
+  @dataclass
+  class Failure(Generic[E]):
+      error: E
+      is_success: bool = False
+
+  Result = Union[Success[T], Failure[E]]
+
+  def divide(a: float, b: float) -> Result[float, str]:
+      if b == 0:
+          return Failure("Division by zero")
+      return Success(a / b)
+
+  # Usage
+  res = divide(10, 0)
+  if res.is_success:
+      print(res.value)
+  else:
+      print(f"Error: {res.error}")
   ```
 
-- Never use bare `except:` clauses
-- Always specify exception type:
-  ```python
-  try:
-      result = risky_operation()
-  except (ValueError, TypeError) as e:
-      logger.error(f"Operation failed: {e}")
-      raise
-  ```
-- Use `finally` for cleanup operations
-- Consider using context managers for resource management
+- **Avoid Bare Except Clauses**: Never use bare `except:` clauses.
+- **Specific Exceptions**: If you must use exceptions (e.g., when implementing standard library protocols), use specific exception types.
+
 
 ### Functions and Methods
 

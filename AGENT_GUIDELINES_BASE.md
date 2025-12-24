@@ -12,14 +12,22 @@
 
 ## Architecture & Design
 
+- **Single Responsibility Principle**: Each module, class, or function should have one, and only one, reason to change. Decompose large, multi-purpose components into smaller, focused ones.
+- **Composition over Configuration/Inheritance**: Favor composition to define behavior. If a component operates in different "modes" with overlapping but distinct dependencies or logic, do not use internal flags or configuration options to switch behavior. Instead, extract shared dependencies and create distinct implementations (strategies) for each mode, then inject the correct implementation.
 - **Service Oriented Architecture**: For **COMPLEX** projects, decompose systems into small, individually testable services located under a `lib` folder.
 - **Implementation Style**: When implementing services, prefer a **procedural** or **functional** style over complex object-oriented patterns.
 - **Declaration Order**: To improve readability and maintainability, declarations should be logically ordered. A good practice is to order declarations based on reverse dependency and the likely call sequence, with exported declarations preceding local ones.
 - **Dependency Structure**: Design services with orthogonality, layering, and proper abstraction levels in mind. Tend towards a tree or diamond dependency pattern. Apply **SOLID principles**.
 - **Adapter Pattern**: Always wrap external APIs or services in an adapter service with minimal logic.
+- **Error Handling**: Favor returning structured **Result Objects** (indicating Success or Failure) for expected domain errors rather than throwing exceptions. This makes error handling explicit in the API contract.
 - **Design Review**: You MUST always have the user review your service design before implementation.
 - **Test Confirmation**: You MUST always ask the user if they would like tests to be added when performing a task.
 - **Manual Testing**: If the user declines automated tests, you MUST try to test manually. If you don't know how to test manually, you MUST ask the user for help.
+
+## Anti-patterns
+
+- **Mode Flags**: Avoid functions, methods, or services that take a boolean flag or "mode" enum to significantly alter their behavior (e.g., `process_data(data, mode='fast')`). This violates SRP and complicates testing. Instead, create separate functions or distinct implementations that share common logic through composition.
+
 
 ## Testing Strategy
 

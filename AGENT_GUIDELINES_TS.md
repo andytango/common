@@ -21,6 +21,8 @@
 
 ## Architecture & Design
 
+- **Single Responsibility Principle**: Each module, class, or function should have one, and only one, reason to change. Decompose large, multi-purpose components into smaller, focused ones.
+- **Composition over Configuration/Inheritance**: Favor composition to define behavior. If a component operates in different "modes" with overlapping but distinct dependencies or logic, do not use internal flags or configuration options to switch behavior. Instead, extract shared dependencies and create distinct implementations (strategies) for each mode.
 - **Service Oriented Architecture**: For **COMPLEX** projects, decompose systems into small, individually testable services located under a `lib` folder.
 - **Implementation Style**: When implementing services, prefer a **procedural** or **functional** style over complex object-oriented patterns.
 - **Dependency Structure**: Design services with orthogonality, layering, and proper abstraction levels in mind. Tend towards a tree or diamond dependency pattern. Apply **SOLID principles**.
@@ -28,6 +30,17 @@
 - **Design Review**: You MUST always have the user review your service design before implementation.
 - **Test Confirmation**: You MUST always ask the user if they would like tests to be added when performing a task.
 - **Manual Testing**: If the user declines automated tests, you MUST try to test manually. If you don't know how to test manually, you MUST ask the user for help.
+
+## Anti-patterns
+
+- **Mode Flags**: Avoid functions or components that take a boolean flag or "mode" enum to significantly alter their behavior.
+  - **Bad**:
+    ```typescript
+    function processUser(user: User, mode: 'full' | 'lite') {
+       if (mode === 'full') { /* ... */ }
+    }
+    ```
+  - **Good**: Use separate functions (`processUserFull`, `processUserLite`) or inject a strategy object that handles the processing variation.
 
 ## TypeScript-Specific Guidelines
 
@@ -116,10 +129,31 @@
 
 ### Error Handling
 
-- Use proper error types and avoid throwing strings
-- Create custom error classes for domain-specific errors
-- Use Result/Either patterns for expected errors when appropriate
-- Always handle Promise rejections
+- **Favor Result Objects over Exceptions**: For expected domain errors, return a structured result object (discriminated union) instead of throwing exceptions. This forces consumers to handle the failure case.
+
+  ```typescript
+  type Result<T, E> =
+    | { success: true; value: T }
+    | { success: false; error: E };
+
+  function divide(a: number, b: number): Result<number, string> {
+    if (b === 0) {
+      return { success: false, error: "Division by zero" };
+    }
+    return { success: true, value: a / b };
+  }
+
+  // Usage
+  const res = divide(10, 2);
+  if (res.success) {
+    console.log(res.value);
+  } else {
+    console.error(res.error);
+  }
+  ```
+
+- **Exceptions**: Reserve `throw` for truly exceptional, unrecoverable system errors (e.g., programmer errors, out of memory).
+- Always handle Promise rejections.
 
 ### Code Organization
 

@@ -23,6 +23,8 @@
 
 ## Architecture & Design
 
+- **Single Responsibility Principle**: Each module, struct, trait, or function should have one, and only one, reason to change. Decompose large, multi-purpose components into smaller, focused ones.
+- **Composition over Configuration/Inheritance**: Favor composition to define behavior. If a component operates in different "modes" with overlapping but distinct dependencies or logic, do not use internal flags or configuration options to switch behavior. Instead, extract shared dependencies and create distinct implementations (strategies) for each mode.
 - **Service Oriented Architecture**: For **COMPLEX** projects, decompose systems into small, individually testable services located under a `lib` folder.
 - **Implementation Style**: When implementing services, prefer a **procedural** or **functional** style over complex object-oriented patterns.
 - **Dependency Structure**: Design services with orthogonality, layering, and proper abstraction levels in mind. Tend towards a tree or diamond dependency pattern. Apply **SOLID principles**.
@@ -30,6 +32,21 @@
 - **Design Review**: You MUST always have the user review your service design before implementation.
 - **Test Confirmation**: You MUST always ask the user if they would like tests to be added when performing a task.
 - **Manual Testing**: If the user declines automated tests, you MUST try to test manually. If you don't know how to test manually, you MUST ask the user for help.
+
+## Anti-patterns
+
+- **Mode Flags**: Avoid functions or structs that take a "mode" enum or boolean flag to significantly alter their behavior.
+  - **Bad**:
+    ```rust
+    enum Mode { Fast, Safe }
+    fn process(data: Data, mode: Mode) {
+        match mode {
+            Mode::Fast => { /* fast logic */ }
+            Mode::Safe => { /* safe logic */ }
+        }
+    }
+    ```
+  - **Good**: Define a `Processor` trait and implement `FastProcessor` and `SafeProcessor`. Use the trait bound or dynamic dispatch to invoke the correct behavior.
 
 ## Rust-Specific Guidelines
 
@@ -45,8 +62,7 @@
 
 - **Never use `unwrap()` or `expect()` in production code** outside of tests
 - Use the `?` operator for error propagation
-- Create custom error types with `thiserror` or `anyhow`:
-
+- **Library Code (`thiserror`)**: For libraries and shared modules, you MUST use `thiserror` to define structured, distinct error types. This allows consumers to handle specific failure cases programmatically.
   ```rust
   use thiserror::Error;
 
@@ -58,7 +74,7 @@
       Config { msg: String },
   }
   ```
-
+- **Application Code (`anyhow`)**: For binary entry points (`main.rs`) or top-level application logic, you MAY use `anyhow` to handle errors where the specific type doesn't matter as much as the report.
 - Use `Result<T, E>` as return type for fallible operations
 - Consider using `Option<T>` for values that might not exist
 
