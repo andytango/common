@@ -1,6 +1,7 @@
 - Use the simplest possible solution
 - Prefer procedural programming and functional programming paradigms.
-- **Simplicity**: Use the simplest possible solution. Service Oriented Architecture is intended for COMPLEX projects. For simple tasks, keep it simple.
+- **Simplicity**: Prioritize **Cognitive Simplicity** over **Code Brevity**. Explicit is better than implicit. Unnested code is better than nested. Code that can be read top-to-bottom is better than clever abstractions. Service Oriented Architecture is intended for COMPLEX projects. For simple tasks, keep it simple.
+- **Conflict Resolution**: If "Simplicity" conflicts with "Robustness" (e.g., Error Handling or SRP), **Robustness wins**. It is better to have verbose, safe, and testable code than concise but fragile code.
 - Use well maintained, mature libraries where possible
 - If you feel a need to use object-oriented programming or polymorphism, then
   ask the user about your design first
@@ -9,6 +10,13 @@
 - Avoid using overriding the linter or using language escape hatches.
 - After you have finished your implementation, run the compiler/interpreter and verify your changes.
 - When handling unknown data structures, use a validation library.
+
+## Pre-Implementation Design Protocol
+
+**Analysis & Planning**: For architectural changes, new services, or complex logic, you MUST first output a brief plan. This plan serves as the basis for the **Design Review** you conduct with the user. It should explicitly address:
+1.  **Safety**: Identify potential edge cases or error states.
+2.  **Architecture**: Verify if Single Responsibility Principle (SRP) is maintained. If a "mode" or variation is detected, explicitly list the strategy classes/functions to be created.
+3.  **Result Definition**: Define the specific `Result<T, E>` types that will be returned, ensuring errors are typed.
 
 ## Architecture & Design
 
@@ -26,7 +34,8 @@
 
 ## Anti-patterns
 
-- **Mode Flags**: Avoid functions, methods, or services that take a boolean flag or "mode" enum to significantly alter their behavior (e.g., `process_data(data, mode='fast')`). This violates SRP and complicates testing. Instead, create separate functions or distinct implementations that share common logic through composition.
+ - **Mode Flags**: Avoid functions, methods, or services that take a boolean flag or "mode" enum to significantly alter their control flow or dependencies (e.g., `process_data(data, mode='fast')`).
+ - **Remediation**: For complex variations, **Strongly Prefer** the Strategy Pattern by creating distinct functions or implementations for each mode (e.g., `FastDataProcessor`, `SafeDataProcessor`) and using composition.
 
 
 ## Testing Strategy

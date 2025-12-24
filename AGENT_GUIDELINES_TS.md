@@ -4,7 +4,8 @@
 
 - Use the simplest possible solution
 - Prefer procedural programming and functional programming paradigms
-- **Simplicity**: Use the simplest possible solution. Service Oriented Architecture is intended for COMPLEX projects. For simple tasks, keep it simple.
+- **Simplicity**: Prioritize **Cognitive Simplicity** over **Code Brevity**. Explicit is better than implicit. Unnested code is better than nested. Code that can be read top-to-bottom is better than clever abstractions. Service Oriented Architecture is intended for COMPLEX projects. For simple tasks, keep it simple.
+- **Conflict Resolution**: If "Simplicity" conflicts with "Robustness" (e.g., Error Handling or SRP), **Robustness wins**. It is better to have verbose, safe, and testable code than concise but fragile code.
 - **Avoid Classes**: Prefer object literals returned by factory functions, along with TypeScript interfaces.
 - Use well-maintained, mature libraries where possible (check npm weekly downloads and last update date)
 - Ensure you include JSDoc comments for all exported functions, classes, and interfaces
@@ -18,6 +19,13 @@
   - Test your implementation using the project's test framework (Jest, Vitest, etc.)
   - If you don't know how to test your implementation, ask the user for help
 - When handling unknown data structures, use a validation library such as Zod, io-ts, or yup
+
+## Pre-Implementation Design Protocol
+
+**Analysis & Planning**: For architectural changes, new services, or complex logic, you MUST first output a brief plan. This plan serves as the basis for the **Design Review** you conduct with the user. It should explicitly address:
+1.  **Safety**: Identify potential edge cases or error states.
+2.  **Architecture**: Verify if Single Responsibility Principle (SRP) is maintained. If a "mode" or variation is detected, explicitly list the strategy objects/functions to be created.
+3.  **Result Definition**: Define the specific `Result<T, E>` types that will be returned, ensuring errors are strongly typed.
 
 ## Architecture & Design
 
@@ -33,14 +41,15 @@
 
 ## Anti-patterns
 
-- **Mode Flags**: Avoid functions or components that take a boolean flag or "mode" enum to significantly alter their behavior.
+- **Mode Flags**: Avoid functions or components that take a boolean flag or "mode" enum to significantly alter their control flow or dependencies.
+  - **Exception**: Simple configuration flags that do not drastically change logic (e.g., `verbose: true`, `dry_run: true`) are acceptable.
   - **Bad**:
     ```typescript
     function processUser(user: User, mode: 'full' | 'lite') {
        if (mode === 'full') { /* ... */ }
     }
     ```
-  - **Good**: Use separate functions (`processUserFull`, `processUserLite`) or inject a strategy object that handles the processing variation.
+  - **Good**: **Strongly Prefer** the Strategy Pattern by creating separate functions (`processUserFull`, `processUserLite`) or injecting a strategy object that handles the processing variation.
 
 ## TypeScript-Specific Guidelines
 
@@ -131,14 +140,19 @@
 
 - **Favor Result Objects over Exceptions**: For expected domain errors, return a structured result object (discriminated union) instead of throwing exceptions. This forces consumers to handle the failure case.
 
+- **The Canonical Result Pattern**: Do not invent your own Result type. Use this exact structure for consistency across the project.
+
   ```typescript
   type Result<T, E> =
     | { success: true; value: T }
     | { success: false; error: E };
 
-  function divide(a: number, b: number): Result<number, string> {
+  // Example with typed error
+  type DivisionError = { code: 'DIV_ZERO'; message: string };
+
+  function divide(a: number, b: number): Result<number, DivisionError> {
     if (b === 0) {
-      return { success: false, error: "Division by zero" };
+      return { success: false, error: { code: 'DIV_ZERO', message: "Division by zero" } };
     }
     return { success: true, value: a / b };
   }
@@ -148,7 +162,7 @@
   if (res.success) {
     console.log(res.value);
   } else {
-    console.error(res.error);
+    console.error(res.error.message);
   }
   ```
 

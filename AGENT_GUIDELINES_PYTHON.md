@@ -4,7 +4,8 @@
 
 - Use the simplest possible solution
 - Prefer procedural programming and functional programming paradigms
-- **Simplicity**: Use the simplest possible solution. Service Oriented Architecture is intended for COMPLEX projects. For simple tasks, keep it simple.
+- **Simplicity**: Prioritize **Cognitive Simplicity** over **Code Brevity**. Explicit is better than implicit. Unnested code is better than nested. Code that can be read top-to-bottom is better than clever abstractions. Service Oriented Architecture is intended for COMPLEX projects. For simple tasks, keep it simple.
+- **Conflict Resolution**: If "Simplicity" conflicts with "Robustness" (e.g., Error Handling or SRP), **Robustness wins**. It is better to have verbose, safe, and testable code than concise but fragile code.
 - Use well-maintained, mature packages where possible (check PyPI downloads and recent releases)
 - If you feel a need to use complex class hierarchies or metaclasses, ask the user about your design first
 - Ensure you include docstrings for all modules, classes, and functions
@@ -21,6 +22,13 @@
   - If you don't know how to test your implementation, ask the user for help
 - When handling unknown data structures, use a validation library such as Pydantic, marshmallow, or cerberus
 
+## Pre-Implementation Design Protocol
+
+**Analysis & Planning**: For architectural changes, new services, or complex logic, you MUST first output a brief plan. This plan serves as the basis for the **Design Review** you conduct with the user. It should explicitly address:
+1.  **Safety**: Identify potential edge cases or error states.
+2.  **Architecture**: Verify if Single Responsibility Principle (SRP) is maintained. If a "mode" or variation is detected, explicitly list the strategy classes/functions to be created.
+3.  **Result Definition**: Define the specific `Result[T, E]` types that will be returned, ensuring errors are typed.
+
 ## Architecture & Design
 
 - **Single Responsibility Principle**: Each module, class, or function should have one, and only one, reason to change. Decompose large, multi-purpose components into smaller, focused ones.
@@ -35,7 +43,8 @@
 
 ## Anti-patterns
 
-- **Mode Flags**: Avoid functions or services that take a boolean flag or "mode" enum to significantly alter their behavior.
+- **Mode Flags**: Avoid functions or services that take a boolean flag or "mode" enum to significantly alter their control flow or dependencies.
+  - **Exception**: Simple configuration flags that do not drastically change logic (e.g., `verbose=True`, `dry_run=True`) are acceptable.
   - **Bad**:
     ```python
     def process_payment(amount, mode="stripe"):
@@ -44,7 +53,7 @@
         elif mode == "paypal":
             # ... paypal logic ...
     ```
-  - **Good**: Create distinct services/functions (`StripePaymentProcessor`, `PayPalPaymentProcessor`) that implement a common protocol or interface. Inject the specific implementation required.
+  - **Good**: **Strongly Prefer** the Strategy Pattern by creating distinct services/functions (`StripePaymentProcessor`, `PayPalPaymentProcessor`) that implement a common protocol or interface. Inject the specific implementation required.
 
 ## Python-Specific Guidelines
 
@@ -123,6 +132,8 @@
 
 - **Favor Result Objects over Exceptions**: Use a structured Result pattern for expected domain errors. Reserve exceptions for truly exceptional, unrecoverable states (e.g., memory errors, configuration errors preventing startup).
 
+- **The Canonical Result Pattern**: Do not invent your own Result type. Use this exact structure for consistency across the project. The `Failure` variant MUST contain a strongly typed error object (e.g., an Enum or Dataclass), NOT a raw string, to allow the caller to handle specific error cases programmatically.
+
   ```python
   from dataclasses import dataclass
   from typing import Generic, TypeVar, Union
@@ -142,9 +153,15 @@
 
   Result = Union[Success[T], Failure[E]]
 
-  def divide(a: float, b: float) -> Result[float, str]:
+  # Example Usage with Typed Error
+  @dataclass
+  class DivisionError:
+      message: str
+      code: int
+
+  def divide(a: float, b: float) -> Result[float, DivisionError]:
       if b == 0:
-          return Failure("Division by zero")
+          return Failure(DivisionError("Division by zero", 100))
       return Success(a / b)
 
   # Usage
@@ -152,7 +169,8 @@
   if res.is_success:
       print(res.value)
   else:
-      print(f"Error: {res.error}")
+      # Error is strongly typed
+      print(f"Error Code: {res.error.code}")
   ```
 
 - **Avoid Bare Except Clauses**: Never use bare `except:` clauses.

@@ -4,7 +4,8 @@
 
 - Use the simplest possible solution
 - Prefer procedural programming and functional programming paradigms
-- **Simplicity**: Use the simplest possible solution. Service Oriented Architecture is intended for COMPLEX projects. For simple tasks, keep it simple.
+- **Simplicity**: Prioritize **Cognitive Simplicity** over **Code Brevity**. Explicit is better than implicit. Unnested code is better than nested. Code that can be read top-to-bottom is better than clever abstractions. Service Oriented Architecture is intended for COMPLEX projects. For simple tasks, keep it simple.
+- **Conflict Resolution**: If "Simplicity" conflicts with "Robustness" (e.g., Error Handling or SRP), **Robustness wins**. It is better to have verbose, safe, and testable code than concise but fragile code.
 - Use well-maintained, mature crates where possible (check crates.io downloads and recent activity)
 - If you feel a need to use complex trait hierarchies or excessive polymorphism, ask the user about your design first
 - Ensure you include documentation comments for all public items
@@ -21,6 +22,13 @@
   - If you don't know how to test your implementation, ask the user for help
 - When handling unknown data structures, use serde for serialization/deserialization with proper validation
 
+## Pre-Implementation Design Protocol
+
+**Analysis & Planning**: For architectural changes, new services, or complex logic, you MUST first output a brief plan. This plan serves as the basis for the **Design Review** you conduct with the user. It should explicitly address:
+1.  **Safety**: Identify potential edge cases or error states.
+2.  **Architecture**: Verify if Single Responsibility Principle (SRP) is maintained. If a "mode" or variation is detected, explicitly list the strategy traits/structs to be created.
+3.  **Result Definition**: Define the specific `Result<T, E>` types that will be returned, specifying the `thiserror` definitions for `E`.
+
 ## Architecture & Design
 
 - **Single Responsibility Principle**: Each module, struct, trait, or function should have one, and only one, reason to change. Decompose large, multi-purpose components into smaller, focused ones.
@@ -35,7 +43,8 @@
 
 ## Anti-patterns
 
-- **Mode Flags**: Avoid functions or structs that take a "mode" enum or boolean flag to significantly alter their behavior.
+- **Mode Flags**: Avoid functions or structs that take a "mode" enum or boolean flag to significantly alter their control flow or dependencies.
+  - **Exception**: Simple configuration flags that do not drastically change logic (e.g., `verbose`, `dry_run`) are acceptable.
   - **Bad**:
     ```rust
     enum Mode { Fast, Safe }
@@ -46,7 +55,7 @@
         }
     }
     ```
-  - **Good**: Define a `Processor` trait and implement `FastProcessor` and `SafeProcessor`. Use the trait bound or dynamic dispatch to invoke the correct behavior.
+  - **Good**: **Strongly Prefer** the Strategy Pattern by defining a `Processor` trait and implementing `FastProcessor` and `SafeProcessor`. Use the trait bound or dynamic dispatch to invoke the correct behavior.
 
 ## Rust-Specific Guidelines
 
