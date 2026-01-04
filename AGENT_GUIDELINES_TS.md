@@ -26,6 +26,7 @@
 1.  **Safety**: Identify potential edge cases or error states.
 2.  **Architecture**: Verify if Single Responsibility Principle (SRP) is maintained. If a "mode" or variation is detected, explicitly list the strategy objects/functions to be created.
 3.  **Result Definition**: Define the specific `Result<T, E>` types that will be returned, ensuring errors are strongly typed.
+4.  **External API Exploration**: Before implementing external API integrations, manually test the API (e.g., using curl) to understand actual response shapes and document them.
 
 ## Architecture & Design
 
@@ -50,6 +51,8 @@
     }
     ```
   - **Good**: **Strongly Prefer** the Strategy Pattern by creating separate functions (`processUserFull`, `processUserLite`) or injecting a strategy object that handles the processing variation.
+- **Testing Against Mental Model**: Avoid writing tests that validate assumptions rather than real API contracts. Tests that pass based on expected behavior but fail against actual external system responses indicate this anti-pattern.
+  - **Remediation**: Test adapters with real API calls whenever practical. When real calls are impractical, use fixture-captured real responses. Unit test all string manipulation (URL construction, ID parsing).
 
 ## TypeScript-Specific Guidelines
 
@@ -197,6 +200,15 @@
 - Test types using utility types like `Expect` or `AssertTrue`
 - Mock external dependencies properly
 - **Adapter Testing**: Only tests for adapters should invoke actual external dependencies. Other services should use mocks or stubs of the adapters.
+
+#### External API Integration Workflow
+
+1. **Explore the API first** - Use curl or similar to understand actual response shapes before writing any code.
+2. **Derive models from real responses** - Application models should be based on actual API responses, not documentation assumptions.
+3. **Adapters parse and validate** - Adapters make real calls and deserialize responses into application models. Adapter integration tests should make real API calls whenever practical; use fixtures only when real calls are impractical (rate limits, costs, destructive operations).
+4. **Mock adapters internally** - All other services use mock versions of adapters. These mocks return properly-typed application models.
+5. **Unit test string manipulation** - URL construction, query parameter handling, ID parsing all need explicit unit tests.
+
 - Aim for meaningful coverage, not just high percentages
 
 ### Performance
