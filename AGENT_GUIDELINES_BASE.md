@@ -39,6 +39,8 @@
  - **Remediation**: For complex variations, **Strongly Prefer** the Strategy Pattern by creating distinct functions or implementations for each mode (e.g., `FastDataProcessor`, `SafeDataProcessor`) and using composition.
  - **Testing Against Mental Model**: Avoid writing tests that validate assumptions rather than real API contracts. Tests that pass based on expected behavior but fail against actual external system responses indicate this anti-pattern.
  - **Remediation**: Test adapters with real API calls whenever practical. When real calls are impractical, use fixture-captured real responses. Unit test all string manipulation (URL construction, ID parsing).
+ - **Dead Code**: Avoid leaving unused code in the codebase, including unused imports, unreachable code paths, commented-out code, unused variables, unused functions, and unused types/classes. Dead code increases cognitive load, obscures intent, and can mislead future readers.
+ - **Remediation**: Run static analysis tools to detect dead code. Remove it immediately rather than commenting it out. Version control preserves history if code needs to be recovered later.
 
 
 ## Testing Strategy
@@ -101,10 +103,11 @@ After making ANY code changes, you MUST run the following commands in order and 
 1. **Format code**: Run the appropriate formatter to ensure consistent code formatting.
 2. **Lint code**: Run the linter to check for code quality issues.
 3. **Type check**: Run the type checker/compiler to verify type correctness (if applicable).
-4. **Run tests with coverage**: Run the test suite with coverage reporting enabled.
-5. **Verify coverage threshold**: Ensure coverage meets the 95% threshold. If coverage is below 95%, you MUST ask the user for help before proceeding.
+4. **Dead code check**: Run static analysis to detect unused imports, variables, functions, and unreachable code. Remove all dead code before proceeding.
+5. **Run tests with coverage**: Run the test suite with coverage reporting enabled.
+6. **Verify coverage threshold**: Ensure coverage meets the 95% threshold. If coverage is below 95%, you MUST ask the user for help before proceeding.
 
-If any of these commands fail, you MUST fix the errors before moving on. Do not mark a task as complete if linting, formatting, type checking, or coverage checks fail.
+If any of these commands fail, you MUST fix the errors before moving on. Do not mark a task as complete if linting, formatting, type checking, dead code detection, or coverage checks fail.
 
 ### Quick Check Command
 

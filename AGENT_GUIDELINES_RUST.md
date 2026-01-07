@@ -65,6 +65,8 @@
   - **Good**: **Strongly Prefer** the Strategy Pattern by defining a `Processor` trait and implementing `FastProcessor` and `SafeProcessor`. Use the trait bound or dynamic dispatch to invoke the correct behavior.
 - **Testing Against Mental Model**: Avoid writing tests that validate assumptions rather than real API contracts. Tests that pass based on expected behavior but fail against actual external system responses indicate this anti-pattern.
   - **Remediation**: Test adapters with real API calls whenever practical. When real calls are impractical, use fixture-captured real responses. Unit test all string manipulation (URL construction, ID parsing).
+- **Dead Code**: Avoid leaving unused code in the codebase, including unused imports, unreachable code paths, commented-out code, unused variables, unused functions, and unused types. Dead code increases cognitive load, obscures intent, and can mislead future readers.
+  - **Remediation**: Rust's compiler warns about dead code by default (`#[warn(dead_code)]`). Ensure warnings are not suppressed. Use `cargo clippy` which provides additional dead code detection. Remove dead code immediately rather than commenting it out. Version control preserves history if code needs to be recovered later.
 
 ## Rust-Specific Guidelines
 
@@ -356,4 +358,5 @@ To achieve 95% coverage, you should proactively refactor and rearchitect the app
 - [ ] Examples in documentation compile and run
 - [ ] Error handling uses `Result` and `?`
 - [ ] No compiler warnings
+- [ ] No dead code (unused imports, variables, functions, types)
 - [ ] Dependencies are justified and minimal

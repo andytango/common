@@ -57,6 +57,8 @@
   - **Good**: **Strongly Prefer** the Strategy Pattern by creating distinct services/functions (`StripePaymentProcessor`, `PayPalPaymentProcessor`) that implement a common protocol or interface. Inject the specific implementation required.
 - **Testing Against Mental Model**: Avoid writing tests that validate assumptions rather than real API contracts. Tests that pass based on expected behavior but fail against actual external system responses indicate this anti-pattern.
   - **Remediation**: Test adapters with real API calls whenever practical. When real calls are impractical, use fixture-captured real responses. Unit test all string manipulation (URL construction, ID parsing).
+- **Dead Code**: Avoid leaving unused code in the codebase, including unused imports, unreachable code paths, commented-out code, unused variables, unused functions, and unused classes. Dead code increases cognitive load, obscures intent, and can mislead future readers.
+  - **Remediation**: Use tools like `vulture`, `ruff` (rules `F401` for unused imports, `F841` for unused variables), or `pylint` to detect dead code. Remove it immediately rather than commenting it out. Version control preserves history if code needs to be recovered later.
 
 ## Python-Specific Guidelines
 
@@ -505,5 +507,6 @@ project/
 - [ ] Type hints for all function signatures
 - [ ] No bare `except:` clauses
 - [ ] No `print()` statements (use logging)
+- [ ] No dead code (unused imports, variables, functions, classes)
 - [ ] Dependencies are documented
 - [ ] Security vulnerabilities checked (`pip audit` or `safety check`)

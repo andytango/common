@@ -53,6 +53,8 @@
   - **Good**: **Strongly Prefer** the Strategy Pattern by creating separate functions (`processUserFull`, `processUserLite`) or injecting a strategy object that handles the processing variation.
 - **Testing Against Mental Model**: Avoid writing tests that validate assumptions rather than real API contracts. Tests that pass based on expected behavior but fail against actual external system responses indicate this anti-pattern.
   - **Remediation**: Test adapters with real API calls whenever practical. When real calls are impractical, use fixture-captured real responses. Unit test all string manipulation (URL construction, ID parsing).
+- **Dead Code**: Avoid leaving unused code in the codebase, including unused imports, unreachable code paths, commented-out code, unused variables, unused functions, and unused types. Dead code increases cognitive load, obscures intent, and can mislead future readers.
+  - **Remediation**: Use ESLint rules (`@typescript-eslint/no-unused-vars`, `no-unreachable`) and tools like `ts-prune` to detect dead code. Remove it immediately rather than commenting it out. Version control preserves history if code needs to be recovered later.
 
 ## TypeScript-Specific Guidelines
 
@@ -308,4 +310,5 @@ To achieve 95% coverage, you should proactively refactor and rearchitect the app
 - [ ] JSDoc comments for public APIs
 - [ ] Types exported where needed
 - [ ] No circular dependencies
+- [ ] No dead code (unused imports, variables, functions, types)
 - [ ] Bundle size impact considered for new dependencies
