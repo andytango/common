@@ -270,6 +270,33 @@
 
 ### Testing
 
+#### Test Coverage Requirements
+
+- **95% Coverage Target**: You MUST aim for 95% test coverage on all code changes. This is a hard requirement, not a suggestion.
+- **The 5% Exception**: The remaining 5% is reserved for code that is truly untestable (e.g., platform-specific code paths, certain error handlers that cannot be triggered in tests, or third-party integration edge cases). Use your judgment to determine what qualifies as truly untestable.
+- **Coverage Measurement**: You MUST run the test suite with coverage reporting after every code change using `pytest --cov` or `coverage run -m pytest`.
+- **Failure Handling**: If coverage is below 95%, you MUST ask the user for help. Do not proceed with incomplete coverage without explicit user guidance.
+
+#### Refactoring for Testability
+
+To achieve 95% coverage, you should proactively refactor and rearchitect the application:
+
+- **Extract Testable Modules**: When encountering difficult-to-reach code paths, extract them into separate, independently testable modules. This makes the code more modular and easier to verify.
+- **Dependency Injection**: Use dependency injection as the primary mechanism for testability. Pass dependencies as function parameters or constructor arguments rather than instantiating them directly.
+- **Adapter Pattern for External Dependencies**: Wrap all external APIs, databases, file systems, and third-party services in adapter modules. This isolates side effects and makes the core logic testable in isolation.
+- **Identify and Restructure Untestable Code**: If code cannot achieve coverage, propose architectural changes to the user. Do not accept "untestable" as a final answer without exploring restructuring options.
+
+#### Test Strategy Documentation
+
+- **Mandatory Test Strategy**: For any code changes, you MUST document a test strategy as part of the pre-implementation design review.
+- **Strategy Contents**: The test strategy should describe:
+  - What will be tested (unit, integration, e2e)
+  - How it will be tested (mocks, fixtures, real dependencies)
+  - Expected coverage impact
+  - Any code that may be excluded from coverage and why
+
+#### Unit & Integration Testing
+
 - Use pytest for testing (preferred over unittest)
 - Write tests alongside implementation
 - Use descriptive test names:
@@ -306,6 +333,15 @@
 3. **Adapters parse and validate** - Adapters make real calls and deserialize responses into application models. Adapter integration tests should make real API calls whenever practical; use fixtures only when real calls are impractical (rate limits, costs, destructive operations).
 4. **Mock adapters internally** - All other services use mock versions of adapters. These mocks return properly-typed application models.
 5. **Unit test string manipulation** - URL construction, query parameter handling, ID parsing all need explicit unit tests.
+
+#### End-to-End Testing
+
+- **Functional Requirements Validation**: E2E tests MUST validate that the system aligns with high-level functional requirements.
+- **User Clarification**: If the functional requirements are not obvious or clearly documented, you MUST ask the user to clarify them before writing E2E tests.
+- **E2E Test Scope**: E2E tests should cover critical user journeys and integration points between services. They complement, but do not replace, unit and integration tests.
+- **E2E Frameworks**: Consider using pytest with appropriate fixtures, or frameworks like `behave` for BDD-style E2E tests.
+
+#### Additional Testing Practices
 
 - Use parametrize for multiple test cases:
   ```python
@@ -462,6 +498,7 @@ project/
 - [ ] Code passes all linters (ruff, flake8, or pylint)
 - [ ] Type checking passes (mypy or pyright)
 - [ ] All tests pass (`pytest`)
+- [ ] Test coverage meets 95% threshold (`pytest --cov --cov-fail-under=95`)
 - [ ] Code formatted with Black or similar formatter
 - [ ] No hardcoded secrets or credentials
 - [ ] Docstrings for all public functions/classes
@@ -470,4 +507,3 @@ project/
 - [ ] No `print()` statements (use logging)
 - [ ] Dependencies are documented
 - [ ] Security vulnerabilities checked (`pip audit` or `safety check`)
-- [ ] Code coverage meets project standards

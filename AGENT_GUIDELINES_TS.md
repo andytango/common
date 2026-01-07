@@ -195,6 +195,33 @@
 
 ### Testing
 
+#### Test Coverage Requirements
+
+- **95% Coverage Target**: You MUST aim for 95% test coverage on all code changes. This is a hard requirement, not a suggestion.
+- **The 5% Exception**: The remaining 5% is reserved for code that is truly untestable (e.g., platform-specific code paths, certain error handlers that cannot be triggered in tests, or third-party integration edge cases). Use your judgment to determine what qualifies as truly untestable.
+- **Coverage Measurement**: You MUST run the test suite with coverage reporting after every code change using `jest --coverage`, `vitest --coverage`, or `c8`/`nyc` for other test runners.
+- **Failure Handling**: If coverage is below 95%, you MUST ask the user for help. Do not proceed with incomplete coverage without explicit user guidance.
+
+#### Refactoring for Testability
+
+To achieve 95% coverage, you should proactively refactor and rearchitect the application:
+
+- **Extract Testable Modules**: When encountering difficult-to-reach code paths, extract them into separate, independently testable modules. This makes the code more modular and easier to verify.
+- **Dependency Injection via Context Objects**: Use context objects or factory function parameters as the primary mechanism for testability. Pass dependencies rather than importing them directly, allowing tests to substitute mocks or stubs.
+- **Adapter Pattern for External Dependencies**: Wrap all external APIs, databases, file systems, and third-party services in adapter modules. This isolates side effects and makes the core logic testable in isolation.
+- **Identify and Restructure Untestable Code**: If code cannot achieve coverage, propose architectural changes to the user. Do not accept "untestable" as a final answer without exploring restructuring options.
+
+#### Test Strategy Documentation
+
+- **Mandatory Test Strategy**: For any code changes, you MUST document a test strategy as part of the pre-implementation design review.
+- **Strategy Contents**: The test strategy should describe:
+  - What will be tested (unit, integration, e2e)
+  - How it will be tested (mocks, fixtures, real dependencies)
+  - Expected coverage impact
+  - Any code that may be excluded from coverage and why
+
+#### Unit & Integration Testing
+
 - Write tests alongside implementation
 - Use descriptive test names that explain the behavior
 - Test types using utility types like `Expect` or `AssertTrue`
@@ -209,7 +236,12 @@
 4. **Mock adapters internally** - All other services use mock versions of adapters. These mocks return properly-typed application models.
 5. **Unit test string manipulation** - URL construction, query parameter handling, ID parsing all need explicit unit tests.
 
-- Aim for meaningful coverage, not just high percentages
+#### End-to-End Testing
+
+- **Functional Requirements Validation**: E2E tests MUST validate that the system aligns with high-level functional requirements.
+- **User Clarification**: If the functional requirements are not obvious or clearly documented, you MUST ask the user to clarify them before writing E2E tests.
+- **E2E Test Scope**: E2E tests should cover critical user journeys and integration points between services. They complement, but do not replace, unit and integration tests.
+- **E2E Frameworks**: Consider using Playwright, Cypress, or Puppeteer for browser-based E2E tests, or supertest for API E2E tests
 
 ### Performance
 
@@ -268,6 +300,9 @@
 - [ ] All TypeScript compilation errors resolved
 - [ ] ESLint warnings and errors addressed
 - [ ] Tests passing
+- [ ] Test coverage meets 95% threshold:
+  - Jest: `jest --coverage --coverageThreshold='{"global":{"lines":95}}'`
+  - Vitest: `vitest run --coverage --coverage.thresholds.lines=95`
 - [ ] No `any` types without justification
 - [ ] No `@ts-ignore` comments
 - [ ] JSDoc comments for public APIs

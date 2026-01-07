@@ -12,9 +12,15 @@
 - Run clippy as frequently as possible to detect any issues and fix them
 - Avoid overriding the linter or using language escape hatches such as:
   - `unsafe` blocks without thorough justification
-  - `#[allow(clippy::...)]` attributes
+  - `#[allow(clippy::...)]` or `#[allow(warnings)]` attributes
   - `unwrap()` in production code
   - Suppressing compiler warnings
+- **Warning Suppression Protocol**: If you believe suppressing a clippy or compiler warning is genuinely necessary:
+  1. You MUST first attempt to fix the underlying issue
+  2. You MUST document the specific reason why suppression is unavoidable (e.g., false positive, external API constraint)
+  3. You MUST ask the user for approval before adding any `#[allow(...)]` attribute
+  4. Use the most specific allow attribute possible (e.g., `#[allow(clippy::needless_return)]` not `#[allow(clippy::all)]`)
+  5. Add a comment explaining why the suppression is necessary
 - After you have finished your implementation:
   - Run `cargo build` to check for compilation errors
   - Run `cargo test` to execute tests
@@ -182,6 +188,33 @@
 
 ### Testing
 
+#### Test Coverage Requirements
+
+- **95% Coverage Target**: You MUST aim for 95% test coverage on all code changes. This is a hard requirement, not a suggestion.
+- **The 5% Exception**: The remaining 5% is reserved for code that is truly untestable (e.g., platform-specific code paths, certain error handlers that cannot be triggered in tests, or FFI edge cases). Use your judgment to determine what qualifies as truly untestable.
+- **Coverage Measurement**: You MUST run the test suite with coverage reporting after every code change using `cargo tarpaulin` or `cargo llvm-cov`.
+- **Failure Handling**: If coverage is below 95%, you MUST ask the user for help. Do not proceed with incomplete coverage without explicit user guidance.
+
+#### Refactoring for Testability
+
+To achieve 95% coverage, you should proactively refactor and rearchitect the application:
+
+- **Extract Testable Modules**: When encountering difficult-to-reach code paths, extract them into separate, independently testable modules. This makes the code more modular and easier to verify.
+- **Dependency Injection via Traits**: Use traits as the primary mechanism for testability. Define service behavior as traits and inject concrete implementations, allowing tests to substitute mock implementations.
+- **Adapter Pattern for External Dependencies**: Wrap all external APIs, databases, file systems, and third-party services in adapter modules behind traits. This isolates side effects and makes the core logic testable in isolation.
+- **Identify and Restructure Untestable Code**: If code cannot achieve coverage, propose architectural changes to the user. Do not accept "untestable" as a final answer without exploring restructuring options.
+
+#### Test Strategy Documentation
+
+- **Mandatory Test Strategy**: For any code changes, you MUST document a test strategy as part of the pre-implementation design review.
+- **Strategy Contents**: The test strategy should describe:
+  - What will be tested (unit, integration, e2e)
+  - How it will be tested (mocks, fixtures, real dependencies)
+  - Expected coverage impact
+  - Any code that may be excluded from coverage and why
+
+#### Unit & Integration Testing
+
 - Write unit tests in the same file using `#[cfg(test)]`:
 
   ```rust
@@ -206,6 +239,15 @@
 3. **Adapters parse and validate** - Adapters make real calls and deserialize responses into application models. Adapter integration tests should make real API calls whenever practical; use fixtures only when real calls are impractical (rate limits, costs, destructive operations).
 4. **Mock adapters internally** - All other services use mock versions of adapters. These mocks return properly-typed application models.
 5. **Unit test string manipulation** - URL construction, query parameter handling, ID parsing all need explicit unit tests.
+
+#### End-to-End Testing
+
+- **Functional Requirements Validation**: E2E tests MUST validate that the system aligns with high-level functional requirements.
+- **User Clarification**: If the functional requirements are not obvious or clearly documented, you MUST ask the user to clarify them before writing E2E tests.
+- **E2E Test Scope**: E2E tests should cover critical user journeys and integration points between services. They complement, but do not replace, unit and integration tests.
+- **E2E in Rust**: Place E2E tests in the `tests/` directory. Consider using test binaries or integration test modules that spin up the full application.
+
+#### Additional Testing Practices
 
 - Use property-based testing with `proptest` or `quickcheck` for complex logic
 - Test error cases explicitly
@@ -305,6 +347,7 @@
 
 - [ ] `cargo build --release` succeeds
 - [ ] `cargo test` passes
+- [ ] Test coverage meets 95% threshold (`cargo tarpaulin --fail-under 95` or `cargo llvm-cov --fail-under-lines 95`)
 - [ ] `cargo clippy -- -W clippy::all` shows no warnings
 - [ ] `cargo fmt --check` passes
 - [ ] No `unwrap()` or `expect()` in production code

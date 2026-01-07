@@ -43,9 +43,42 @@
 
 ## Testing Strategy
 
+### Test Coverage Requirements
+
+- **95% Coverage Target**: You MUST aim for 95% test coverage on all code changes. This is a hard requirement, not a suggestion.
+- **The 5% Exception**: The remaining 5% is reserved for code that is truly untestable (e.g., platform-specific code paths, certain error handlers that cannot be triggered in tests, or third-party integration edge cases). Use your judgment to determine what qualifies as truly untestable.
+- **Coverage Measurement**: You MUST run the test suite with coverage reporting after every code change.
+- **Failure Handling**: If coverage is below 95%, you MUST ask the user for help. Do not proceed with incomplete coverage without explicit user guidance.
+
+### Refactoring for Testability
+
+To achieve 95% coverage, you should proactively refactor and rearchitect the application:
+
+- **Extract Testable Modules**: When encountering difficult-to-reach code paths, extract them into separate, independently testable modules. This makes the code more modular and easier to verify.
+- **Dependency Injection**: Use dependency injection as the primary mechanism for testability. Inject dependencies rather than instantiating them directly, allowing tests to substitute mocks or stubs.
+- **Adapter Pattern for External Dependencies**: Wrap all external APIs, databases, file systems, and third-party services in adapter modules. This isolates side effects and makes the core logic testable in isolation.
+- **Identify and Restructure Untestable Code**: If code cannot achieve coverage, propose architectural changes to the user. Do not accept "untestable" as a final answer without exploring restructuring options.
+
+### Test Strategy Documentation
+
+- **Mandatory Test Strategy**: For any code changes, you MUST document a test strategy as part of the pre-implementation design review.
+- **Strategy Contents**: The test strategy should describe:
+  - What will be tested (unit, integration, e2e)
+  - How it will be tested (mocks, fixtures, real dependencies)
+  - Expected coverage impact
+  - Any code that may be excluded from coverage and why
+
+### Unit & Integration Testing
+
 - Services should be individually testable.
 - The test suite should expect external dependencies to be present.
 - Ideally, only tests for adapters should invoke actual external dependencies. Other services should use mocks or stubs of the adapters to maximize performance.
+
+### End-to-End Testing
+
+- **Functional Requirements Validation**: E2E tests MUST validate that the system aligns with high-level functional requirements.
+- **User Clarification**: If the functional requirements are not obvious or clearly documented, you MUST ask the user to clarify them before writing E2E tests.
+- **E2E Test Scope**: E2E tests should cover critical user journeys and integration points between services. They complement, but do not replace, unit and integration tests.
 
 ### External API Integration Workflow
 
@@ -68,9 +101,11 @@ After making ANY code changes, you MUST run the following commands in order and 
 1. **Format code**: Run the appropriate formatter to ensure consistent code formatting.
 2. **Lint code**: Run the linter to check for code quality issues.
 3. **Type check**: Run the type checker/compiler to verify type correctness (if applicable).
+4. **Run tests with coverage**: Run the test suite with coverage reporting enabled.
+5. **Verify coverage threshold**: Ensure coverage meets the 95% threshold. If coverage is below 95%, you MUST ask the user for help before proceeding.
 
-If any of these commands fail, you MUST fix the errors before moving on. Do not mark a task as complete if linting, formatting, or type checking fails.
+If any of these commands fail, you MUST fix the errors before moving on. Do not mark a task as complete if linting, formatting, type checking, or coverage checks fail.
 
 ### Quick Check Command
 
-If available, run all checks at once using the project's configured check command.
+If available, run all checks at once using the project's configured check command. Ensure the check command includes coverage reporting.
