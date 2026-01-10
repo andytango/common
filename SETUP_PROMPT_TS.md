@@ -33,6 +33,67 @@ Enforces:
 - **No `any` type**
 - **Prettier integration** as lint errors
 
+#### Type Safety Rules
+
+```javascript
+{
+  rules: {
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/explicit-function-return-type": "error",
+    "@typescript-eslint/no-unsafe-assignment": "error",
+    "@typescript-eslint/no-unsafe-member-access": "error",
+    "@typescript-eslint/no-unsafe-call": "error",
+    "@typescript-eslint/no-unsafe-return": "error",
+    "@typescript-eslint/ban-ts-comment": "error",
+    "@typescript-eslint/prefer-unknown-to-any": "error",
+  }
+}
+```
+
+#### Import Rules
+
+```javascript
+{
+  rules: {
+    "import/order": ["error", {
+      "groups": ["builtin", "external", "internal", "parent", "sibling", "index", "type"],
+      "newlines-between": "always",
+      "alphabetize": { "order": "asc" }
+    }],
+    "import/no-cycle": "error",
+    "import/no-default-export": "warn",
+    "import/no-duplicates": "error",
+  }
+}
+```
+
+#### Dead Code Rules
+
+```javascript
+{
+  rules: {
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "no-unreachable": "error",
+  }
+}
+```
+
+#### Naming Convention Rules
+
+```javascript
+{
+  rules: {
+    "@typescript-eslint/naming-convention": [
+      "error",
+      { "selector": "variable", "format": ["camelCase", "UPPER_CASE"] },
+      { "selector": "function", "format": ["camelCase"] },
+      { "selector": "typeLike", "format": ["PascalCase"] },
+      { "selector": "enumMember", "format": ["UPPER_CASE"] },
+    ]
+  }
+}
+```
+
 ### Prettier (.prettierrc.json)
 
 Standard formatting with single quotes, semicolons, 2-space tabs, trailing commas

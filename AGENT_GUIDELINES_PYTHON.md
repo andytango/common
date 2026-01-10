@@ -91,48 +91,6 @@
 - Prefer `Optional[T]` over `Union[T, None]`
 - Use `typing.Protocol` for structural subtyping
 
-### Code Style (PEP 8)
-
-- Follow PEP 8 style guide
-- Use 4 spaces for indentation (never tabs)
-- Maximum line length of 88 characters (Black formatter default)
-- Use descriptive variable names:
-  - `snake_case` for functions, variables, modules
-  - `PascalCase` for classes
-  - `UPPER_SNAKE_CASE` for constants
-- Two blank lines between top-level definitions
-- One blank line between methods
-
-### Docstrings
-
-- Use docstrings for all public modules, functions, classes, and methods:
-
-  ```python
-  def fetch_user_data(user_id: int, include_profile: bool = False) -> Dict[str, Any]:
-      """
-      Fetch user data from the database.
-
-      Args:
-          user_id: The unique identifier of the user.
-          include_profile: Whether to include profile information.
-
-      Returns:
-          A dictionary containing user data.
-
-      Raises:
-          UserNotFoundError: If the user does not exist.
-          DatabaseConnectionError: If database connection fails.
-
-      Example:
-          >>> user = fetch_user_data(123, include_profile=True)
-          >>> print(user['name'])
-      """
-      ...
-  ```
-
-- Use Google, NumPy, or Sphinx docstring style consistently
-- Include type information in docstrings if not using type hints
-
 ### Error Handling
 
 - **Favor Result Objects over Exceptions**: Use a structured Result pattern for expected domain errors. Reserve exceptions for truly exceptional, unrecoverable states (e.g., memory errors, configuration errors preventing startup).
@@ -236,39 +194,6 @@
       def area(self) -> float:
           return 3.14159 * self._radius ** 2
   ```
-
-### Imports
-
-- Order imports according to PEP 8:
-  1. Standard library imports
-  2. Related third-party imports
-  3. Local application imports
-- Use absolute imports when possible
-- Avoid wildcard imports (`from module import *`)
-- Group imports logically:
-
-  ```python
-  import os
-  import sys
-  from datetime import datetime
-  from pathlib import Path
-
-  import numpy as np
-  import pandas as pd
-  from pydantic import BaseModel, Field
-
-  from myapp.models import User
-  from myapp.utils import calculate_hash
-  ```
-
-### Code Organization
-
-- **Declaration Order**: To improve readability and maintainability, declarations should be logically ordered. While Python's dynamic nature is flexible, a good practice is to order declarations based on reverse dependency and the likely call sequence:
-  1.  **Constants**: `UPPER_SNAKE_CASE` variables.
-  2.  **Public Classes**: Classes intended for external use.
-  3.  **Public Functions**: Functions intended for external use.
-  4.  **Private Classes**: Internal helper classes, prefixed with an underscore (`_`).
-  5.  **Private Functions**: Internal helper functions, prefixed with an underscore (`_`).
 
 ### Testing
 

@@ -140,25 +140,6 @@
 - Document panic conditions
 - Document safety requirements for `unsafe` functions
 
-### Code Organization
-
-- **Declaration Order**: To improve readability and maintainability, declarations should be logically ordered. While `rustfmt` handles most formatting, a good practice is to order declarations based on reverse dependency and the likely call sequence:
-  1.  `use` statements.
-  2.  `static` and `const` items.
-  3.  `type` definitions (`struct`, `enum`, `union`).
-  4.  `trait` definitions.
-  5.  `impl` blocks.
-  6.  Public functions (`pub fn`).
-  7.  Private functions (`fn`).
-- Keep modules small and focused
-- Use `mod.rs` or separate files for module organization
-- Follow Rust naming conventions:
-  - `snake_case` for functions, variables, modules
-  - `PascalCase` for types, traits
-  - `SCREAMING_SNAKE_CASE` for constants
-- One type/trait per file for complex items
-- Group related functionality in modules
-
 ### Traits and Generics
 
 - **Services as Traits**: Define services using traits to allow for easy mocking and dependency injection.
