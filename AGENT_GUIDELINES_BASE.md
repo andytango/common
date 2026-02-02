@@ -11,6 +11,21 @@
 - After you have finished your implementation, run the compiler/interpreter and verify your changes.
 - When handling unknown data structures, use a validation library.
 
+## Project Structure
+
+All projects MUST have a `tmp/` directory for temporary agent-generated files (scripts, documentation, disposable files). Projects SHOULD include `credentials/` and `logs/` directories if needed.
+
+Each directory must contain a `.gitkeep` file and be gitignored:
+
+```
+tmp/*
+!tmp/.gitkeep
+credentials/*
+!credentials/.gitkeep
+logs/*
+!logs/.gitkeep
+```
+
 ## Pre-Implementation Design Protocol
 
 **Analysis & Planning**: For architectural changes, new services, or complex logic, you MUST first output a brief plan. This plan serves as the basis for the **Design Review** you conduct with the user. It should explicitly address:

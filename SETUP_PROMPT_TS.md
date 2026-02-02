@@ -15,6 +15,15 @@ Set up a TypeScript development environment with strict type checking, comprehen
 npm install
 ```
 
+## Project Structure
+
+```bash
+mkdir -p tmp && touch tmp/.gitkeep
+# Also create credentials/ and logs/ if needed
+```
+
+Add to `.gitignore`: `tmp/*`, `!tmp/.gitkeep` (and similar for credentials/logs if used)
+
 ## Configuration Details
 
 ### TypeScript (tsconfig.json)

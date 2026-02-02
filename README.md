@@ -12,6 +12,7 @@ This repository provides standardized guidelines that help AI coding agents writ
 
 - **[AGENT_GUIDELINES_BASE.md](./AGENT_GUIDELINES_BASE.md)**: Core principles applicable to all languages
   - Simplicity and maintainability
+  - Standardized project directory structure (`tmp/`, `credentials/`, `logs/`)
   - Functional and procedural programming preferences
   - Linting and formatting requirements
   - Post-implementation validation workflows
