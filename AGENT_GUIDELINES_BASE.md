@@ -10,6 +10,8 @@
 - Avoid using overriding the linter or using language escape hatches.
 - After you have finished your implementation, run the compiler/interpreter and verify your changes.
 - When handling unknown data structures, use a validation library.
+- **Nullable over Optional**: Always prefer nullable fields over optional fields in type definitions, unless there is a framework or environment-specific reason requiring optional fields. Nullable fields (`field: T | null`) are explicit about the field's presence, while optional fields (`field?: T`) leave ambiguity about whether the field exists.
+- **Discriminated Unions over Nullable Fields**: When multiple fields change together based on state, use discriminated unions (tagged unions/sum types) instead of multiple nullable properties. This makes invalid states unrepresentable at the type level.
 
 ## Project Structure
 

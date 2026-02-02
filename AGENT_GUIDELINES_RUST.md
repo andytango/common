@@ -108,6 +108,44 @@
   ```
 - Prefer enums for state machines and variants
 - Use phantom types for additional compile-time safety when needed
+- **Explicit Option<T> for Nullable Fields**: When a struct field may be absent or null, always use `Option<T>` rather than using default values or builder patterns to simulate optionality. This makes nullability explicit in the type signature.
+  ```rust
+  // Prefer this:
+  struct User {
+      name: String,
+      email: Option<String>,  // Explicitly nullable
+  }
+
+  // Avoid this:
+  struct User {
+      name: String,
+      email: String,  // Empty string to represent "no email"
+  }
+  ```
+- **Enums (Discriminated Unions) over Nullable Fields**: When multiple fields represent different states, use enums instead of structs with multiple `Option<T>` fields. This makes invalid states unrepresentable.
+  ```rust
+  // Avoid this - multiple Option fields create invalid states:
+  struct PaymentBad {
+      id: String,
+      stripe_token: Option<String>,
+      paypal_order_id: Option<String>,
+      // Can have both None, or both Some (invalid!)
+  }
+
+  // Prefer this - enum ensures valid states only:
+  enum Payment {
+      Stripe { id: String, token: String },
+      Paypal { id: String, order_id: String },
+  }
+
+  // Compiler enforces exhaustive matching:
+  fn process_payment(payment: Payment) {
+      match payment {
+          Payment::Stripe { token, .. } => charge_stripe(&token),
+          Payment::Paypal { order_id, .. } => charge_paypal(&order_id),
+      }
+  }
+  ```
 
 ### Documentation
 

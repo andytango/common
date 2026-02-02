@@ -90,6 +90,55 @@
 - Use `TypedDict` for dictionary schemas
 - Prefer `Optional[T]` over `Union[T, None]`
 - Use `typing.Protocol` for structural subtyping
+- **Nullable over Optional in Data Models**: In dataclasses, Pydantic models, and TypedDict, always include fields with `| None` type (nullable) rather than making them optional with `field: NotRequired[T]` or default values, unless there is a framework-specific reason.
+  ```python
+  # Prefer this:
+  @dataclass
+  class User:
+      name: str
+      email: str | None  # Field always exists, may be None
+
+  # Avoid this:
+  @dataclass
+  class User:
+      name: str
+      email: str = None  # Field may be omitted in dict representation
+  ```
+- **Discriminated Unions over Nullable Fields**: When fields represent different states, use unions of dataclasses (or Pydantic models) with a discriminator field instead of multiple nullable properties.
+  ```python
+  from dataclasses import dataclass
+  from typing import Literal
+
+  # Avoid this - multiple nullable fields create invalid states:
+  @dataclass
+  class PaymentBad:
+      id: str
+      stripe_token: str | None
+      paypal_order_id: str | None
+      # Can have both None, or both set (invalid!)
+
+  # Prefer this - discriminated union ensures valid states only:
+  @dataclass
+  class StripePayment:
+      method: Literal['stripe']
+      id: str
+      token: str
+
+  @dataclass
+  class PaypalPayment:
+      method: Literal['paypal']
+      id: str
+      order_id: str
+
+  Payment = StripePayment | PaypalPayment
+
+  # Type checker enforces correctness:
+  def process_payment(payment: Payment) -> None:
+      if payment.method == 'stripe':
+          charge_stripe(payment.token)  # payment.token is available
+      else:
+          charge_paypal(payment.order_id)  # payment.order_id is available
+  ```
 
 ### Error Handling
 
