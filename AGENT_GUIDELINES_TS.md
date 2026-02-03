@@ -58,6 +58,53 @@
 
 ## TypeScript-Specific Guidelines
 
+### Type Definitions
+
+- **Nullable over Optional**: Always use nullable fields (`field: T | null`) instead of optional fields (`field?: T`) unless there is a framework-specific reason (e.g., React props, API client libraries with specific conventions).
+  ```typescript
+  // Prefer this:
+  interface User {
+    name: string;
+    email: string | null;  // Field always exists, may be null
+  }
+
+  // Avoid this:
+  interface User {
+    name: string;
+    email?: string;  // Field may not exist (undefined)
+  }
+  ```
+  - Nullable fields make serialization explicit (field always appears in JSON)
+  - Forces explicit null checks instead of relying on optional chaining
+  - Clearer API contracts for consumers
+
+- **Discriminated Unions over Nullable Fields**: When multiple fields represent different states or modes, use discriminated unions instead of nullable properties. This makes invalid states unrepresentable.
+  ```typescript
+  // Avoid this - multiple nullable fields create invalid states:
+  interface PaymentBad {
+    id: string;
+    stripeToken: string | null;
+    paypalOrderId: string | null;
+    // Can have both null, or both set (invalid!)
+  }
+
+  // Prefer this - discriminated union ensures valid states only:
+  type Payment =
+    | { id: string; method: 'stripe'; token: string }
+    | { id: string; method: 'paypal'; orderId: string };
+
+  // TypeScript enforces correctness:
+  function processPayment(payment: Payment): void {
+    if (payment.method === 'stripe') {
+      // payment.token is available here
+      chargeStripe(payment.token);
+    } else {
+      // payment.orderId is available here
+      chargePaypal(payment.orderId);
+    }
+  }
+  ```
+
 ### Functions and Methods
 
 - **Context Objects**: When functions share common context or state (e.g., database client, logger, external service, callbacks, or common data parameters), use a "context object" passed as the first argument with an explicit interface:

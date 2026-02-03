@@ -15,6 +15,15 @@ Set up a Rust development environment with strict linting, comprehensive type ch
 cargo install cargo-tarpaulin
 ```
 
+## Project Structure
+
+```bash
+mkdir -p tmp && touch tmp/.gitkeep
+# Also create credentials/ and logs/ if needed
+```
+
+Add to `.gitignore`: `tmp/*`, `!tmp/.gitkeep` (and similar for credentials/logs if used)
+
 ## Configuration Details
 
 ### Cargo.toml

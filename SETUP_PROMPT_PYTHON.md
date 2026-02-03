@@ -20,6 +20,15 @@ Or add to pyproject.toml:
 pip install -e ".[dev]"
 ```
 
+## Project Structure
+
+```bash
+mkdir -p tmp && touch tmp/.gitkeep
+# Also create credentials/ and logs/ if needed
+```
+
+Add to `.gitignore`: `tmp/*`, `!tmp/.gitkeep` (and similar for credentials/logs if used)
+
 ## Configuration Details
 
 ### pyproject.toml
