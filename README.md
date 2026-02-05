@@ -49,6 +49,26 @@ This repository provides standardized guidelines that help AI coding agents writ
   - Required npm scripts
   - JSDoc enforcement
 
+- **[SETUP_PROMPT_PYTHON.md](./SETUP_PROMPT_PYTHON.md)**: Python project setup
+  - Tooling configuration (mypy, ruff, black)
+  - Type checking settings
+  - Testing setup with pytest
+
+- **[SETUP_PROMPT_RUST.md](./SETUP_PROMPT_RUST.md)**: Rust project setup
+  - Clippy and rustfmt configuration
+  - Cargo.toml best practices
+  - Documentation requirements
+
+### Claude Code Skill
+
+- **[SETUP_SKILL.md](./SETUP_SKILL.md)**: Claude Code skill for automated setup
+  - Auto-detects project language(s)
+  - Fetches and combines appropriate guidelines
+  - Creates AGENTS.md and CLAUDE.md symlink
+  - Handles monorepos with nested projects
+  - Installation: `mkdir -p ~/.claude/skills/setup-guidelines && cp SETUP_SKILL.md ~/.claude/skills/setup-guidelines/SKILL.md`
+  - Usage: `/setup-guidelines` or `/setup-guidelines [project-path]`
+
 ## Core Principles
 
 All guidelines share these fundamental principles:
