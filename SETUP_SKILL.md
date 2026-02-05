@@ -207,19 +207,17 @@ After processing all projects, provide a summary:
 3. Wait for explicit user confirmation
 4. If confirmed, create the commit using conventional commits format
 
-## Installation
+## Updating This Skill
 
-To use this skill, install it to your personal Claude skills directory:
+This skill can update itself to the latest version from GitHub. If the user requests it, or if you detect you may be running an outdated version:
 
 ```bash
-# Download and install the skill
+# Update the skill to the latest version
 curl -o ~/.claude/skills/setup-guidelines/SKILL.md \
   https://raw.githubusercontent.com/andytango/common/main/SETUP_SKILL.md
-
-# Or if you've cloned the repo:
-mkdir -p ~/.claude/skills/setup-guidelines
-cp /path/to/common/SETUP_SKILL.md ~/.claude/skills/setup-guidelines/SKILL.md
 ```
+
+After updating, inform the user that they may need to restart Claude Code or run the skill again to use the latest version.
 
 ## Example Usage
 
