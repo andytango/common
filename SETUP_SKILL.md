@@ -13,7 +13,7 @@ You are tasked with setting up agent development guidelines for a project (or mu
 
 Project path to setup: $ARGUMENTS (defaults to current directory if not provided)
 
-## Step 1: Discover Projects
+## Step 1: Discover and Analyze Projects
 
 1. If $ARGUMENTS is provided, use that as the base path. Otherwise, use the current working directory.
 2. Check if the base path contains a package.json, Cargo.toml, pyproject.toml, or other language-specific project files
@@ -22,12 +22,24 @@ Project path to setup: $ARGUMENTS (defaults to current directory if not provided
    - TypeScript/JavaScript: package.json with typescript dependency or .ts files
    - Rust: Cargo.toml
    - Python: pyproject.toml, setup.py, or requirements.txt
+5. **Determine if the project is new or existing**:
+   - **New project**: No source code files (empty `src/` or equivalent), or only scaffolding/boilerplate
+   - **Existing project**: Has substantial source code with established patterns
 
-## Step 2: Fetch Guidelines
+## Step 2: Fetch Appropriate Guidelines
 
-For each language detected, fetch the latest guidelines from https://github.com/andytango/common:
+The guidelines to fetch depend on whether this is a new or existing project:
 
-**Base guidelines (always include):**
+### For NEW Projects (no existing code)
+
+Fetch setup prompts AND guidelines:
+
+**Setup prompts (prescriptive for new projects):**
+- TypeScript: `https://raw.githubusercontent.com/andytango/common/main/SETUP_PROMPT_TS.md`
+- Python: `https://raw.githubusercontent.com/andytango/common/main/SETUP_PROMPT_PYTHON.md`
+- Rust: `https://raw.githubusercontent.com/andytango/common/main/SETUP_PROMPT_RUST.md`
+
+**Base guidelines:**
 - `https://raw.githubusercontent.com/andytango/common/main/AGENT_GUIDELINES_BASE.md`
 
 **Language-specific guidelines:**
@@ -35,10 +47,27 @@ For each language detected, fetch the latest guidelines from https://github.com/
 - Python: `https://raw.githubusercontent.com/andytango/common/main/AGENT_GUIDELINES_PYTHON.md`
 - Rust: `https://raw.githubusercontent.com/andytango/common/main/AGENT_GUIDELINES_RUST.md`
 
-**Setup prompts (optional, based on language):**
-- TypeScript: `https://raw.githubusercontent.com/andytango/common/main/SETUP_PROMPT_TS.md`
-- Python: `https://raw.githubusercontent.com/andytango/common/main/SETUP_PROMPT_PYTHON.md`
-- Rust: `https://raw.githubusercontent.com/andytango/common/main/SETUP_PROMPT_RUST.md`
+### For EXISTING Projects (has established code)
+
+1. **Analyze existing conventions** using Glob and Read tools:
+   - Error handling patterns (try/catch, Result types, discriminated unions)
+   - Naming conventions (camelCase, snake_case, file naming)
+   - Code organization (directory structure, module patterns)
+   - Testing patterns (test file location, naming, mocking style)
+   - Documentation style (JSDoc, docstrings, inline comments)
+
+2. **Fetch only language-specific guidelines** (NOT setup prompts):
+   - Base: `https://raw.githubusercontent.com/andytango/common/main/AGENT_GUIDELINES_BASE.md`
+   - Language-specific guideline for each detected language
+
+3. **Compare guidelines with existing conventions**:
+   - Identify conflicts (e.g., guidelines recommend discriminated unions but project uses Result<T>)
+   - Identify gaps (e.g., guidelines require 95% test coverage but project has 60%)
+
+4. **Present conflicts to user** with options:
+   - **Option A**: Update the project to match guidelines (provide estimate of scope)
+   - **Option B**: Exclude conflicting guidelines from AGENTS.md and document the project's conventions
+   - **Option C**: Document as "Future Goal" - keep guideline but note current state
 
 Use the WebFetch tool to retrieve the raw content from these URLs.
 
@@ -50,29 +79,83 @@ For each project directory:
    - If it exists, read it first to understand any custom guidelines
    - Ask the user if they want to preserve custom sections or completely replace the file
 
-2. **Create/Update AGENTS.md** with the following structure:
-   ```markdown
-   # Agent Development Guidelines
+2. **Create/Update AGENTS.md** based on project type:
 
-   This project follows the agent development guidelines from [andytango/common](https://github.com/andytango/common).
+### For NEW Projects
 
-   **Last updated**: [current date]
-   **Languages**: [detected languages]
+Create AGENTS.md with setup prompts and guidelines:
 
-   ---
+```markdown
+# Agent Development Guidelines
 
-   [Insert AGENT_GUIDELINES_BASE.md content]
+This project follows the agent development guidelines from [andytango/common](https://github.com/andytango/common).
 
-   ---
+**Last updated**: [current date]
+**Languages**: [detected languages]
+**Project status**: New project
 
-   [Insert language-specific guidelines for each detected language]
+---
 
-   ---
+## Setup Instructions
 
-   ## Project-Specific Guidelines
+[Insert SETUP_PROMPT_[LANGUAGE].md content for each language]
 
-   [Any custom guidelines - preserve if user requests, or leave blank for new files]
-   ```
+---
+
+## Development Guidelines
+
+[Insert AGENT_GUIDELINES_BASE.md content]
+
+---
+
+[Insert language-specific guidelines for each detected language]
+
+---
+
+## Project-Specific Guidelines
+
+[Empty section for future customization]
+```
+
+### For EXISTING Projects
+
+Create AGENTS.md with guidelines adapted to existing conventions:
+
+```markdown
+# Agent Development Guidelines
+
+This project follows the agent development guidelines from [andytango/common](https://github.com/andytango/common), adapted to existing project conventions.
+
+**Last updated**: [current date]
+**Languages**: [detected languages]
+**Project status**: Existing project
+
+---
+
+[Insert AGENT_GUIDELINES_BASE.md content]
+
+---
+
+[Insert language-specific guidelines for each detected language, with modifications noted below]
+
+---
+
+## Project Conventions
+
+This section documents where this project's established conventions differ from the standard guidelines:
+
+[List any conflicts between guidelines and existing code, with the project's approach documented]
+
+**Example:**
+- **Error Handling**: Standard guidelines recommend discriminated unions. This project uses a generic `Result<T, E>` type consistently across the codebase. Maintain this pattern for consistency.
+- **Test Coverage**: Standard guidelines require 95%. Current coverage is 67%. **Future Goal**: Incrementally improve to 95%.
+
+---
+
+## Project-Specific Guidelines
+
+[Any additional custom guidelines]
+```
 
 3. **Create/Update CLAUDE.md symlink**:
    - Check if CLAUDE.md exists
@@ -88,7 +171,7 @@ After processing all projects, provide a summary:
 ## Setup Summary
 
 ### Projects Updated:
-- [Project path 1]: [Languages] - AGENTS.md [created/updated], CLAUDE.md symlink [created/verified]
+- [Project path 1]: [NEW/EXISTING] - [Languages] - AGENTS.md [created/updated], CLAUDE.md symlink [created/verified]
 - [Project path 2]: ...
 
 ### Guidelines Applied:
@@ -97,10 +180,22 @@ After processing all projects, provide a summary:
 - Python guidelines (if applicable)
 - Rust guidelines (if applicable)
 
+### For New Projects:
+- Setup prompts included for initial project configuration
+- All standard guidelines applied
+
+### For Existing Projects:
+- Analyzed existing conventions
+- Conflicts detected: [list any conflicts]
+- User decisions: [summarize what user chose for each conflict]
+- Project Conventions section added to document differences
+
 ### Next Steps:
 1. Review the generated AGENTS.md files
-2. Add any project-specific guidelines to the "Project-Specific Guidelines" section
-3. Commit the changes when ready
+2. For NEW projects: Follow the setup prompts to configure tooling
+3. For EXISTING projects: Review the "Project Conventions" section for accuracy
+4. Add any additional project-specific guidelines to the "Project-Specific Guidelines" section
+5. Commit the changes when ready
 ```
 
 ## Step 5: Wait for User Confirmation
