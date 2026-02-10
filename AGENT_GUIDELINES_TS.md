@@ -25,7 +25,7 @@
 **Analysis & Planning**: For architectural changes, new services, or complex logic, you MUST first output a brief plan. This plan serves as the basis for the **Design Review** you conduct with the user. It should explicitly address:
 1.  **Safety**: Identify potential edge cases or error states.
 2.  **Architecture**: Verify if Single Responsibility Principle (SRP) is maintained. If a "mode" or variation is detected, explicitly list the strategy objects/functions to be created.
-3.  **Result Definition**: Define the specific `Result<T, E>` types that will be returned, ensuring errors are strongly typed.
+3.  **Result Definition**: Define the specific discriminated union types that will be returned for success and failure cases, ensuring all outcomes are strongly typed.
 4.  **External API Exploration**: Before implementing external API integrations, manually test the API (e.g., using curl) to understand actual response shapes and document them.
 
 ## Architecture & Design
@@ -162,33 +162,46 @@
 
 ### Error Handling
 
-- **Favor Result Objects over Exceptions**: For expected domain errors, return a structured result object (discriminated union) instead of throwing exceptions. This forces consumers to handle the failure case.
+- **Favor Discriminated Unions over Exceptions**: For expected domain errors, return a discriminated union instead of throwing exceptions. This forces consumers to handle all possible outcomes explicitly.
 
-- **The Canonical Result Pattern**: Do not invent your own Result type. Use this exact structure for consistency across the project.
+- **Tailored Discriminated Unions**: Define discriminated unions that are specific to each function's needs. This is more idiomatic TypeScript and provides better type inference.
 
   ```typescript
-  type Result<T, E> =
-    | { success: true; value: T }
-    | { success: false; error: E };
+  // Example 1: Simple success/failure with specific error code
+  type DivideResult =
+    | { success: true; value: number }
+    | { success: false; code: 'DIV_ZERO'; message: string };
 
-  // Example with typed error
-  type DivisionError = { code: 'DIV_ZERO'; message: string };
-
-  function divide(a: number, b: number): Result<number, DivisionError> {
+  function divide(a: number, b: number): DivideResult {
     if (b === 0) {
-      return { success: false, error: { code: 'DIV_ZERO', message: "Division by zero" } };
+      return { success: false, code: 'DIV_ZERO', message: "Division by zero" };
     }
     return { success: true, value: a / b };
   }
 
-  // Usage
+  // Example 2: Multiple failure modes
+  type FetchUserResult =
+    | { success: true; user: User }
+    | { success: false; reason: 'not_found'; userId: string }
+    | { success: false; reason: 'network_error'; message: string }
+    | { success: false; reason: 'unauthorized' };
+
+  // Example 3: Multiple success modes
+  type ProcessPaymentResult =
+    | { status: 'completed'; transactionId: string; amount: number }
+    | { status: 'pending'; estimatedCompletionTime: Date }
+    | { status: 'failed'; errorCode: string; retryable: boolean };
+
+  // Usage with type narrowing
   const res = divide(10, 2);
   if (res.success) {
-    console.log(res.value);
+    console.log(res.value); // TypeScript knows res.value exists
   } else {
-    console.error(res.error.message);
+    console.error(res.code, res.message); // TypeScript knows these exist
   }
   ```
+
+- **Discriminator Field**: Use a consistent discriminator field name within a function (e.g., `success`, `status`, `type`). TypeScript will use this for type narrowing.
 
 - **Exceptions**: Reserve `throw` for truly exceptional, unrecoverable system errors (e.g., programmer errors, out of memory).
 - Always handle Promise rejections.
